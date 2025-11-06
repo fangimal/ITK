@@ -1,0 +1,31 @@
+### 1. Создать кошелёк
+POST http://localhost:8080/api/v1/wallets
+Content-Type: application/json
+
+
+### 2. Пополнение
+POST http://localhost:8080/api/v1/wallet
+Content-Type: application/json
+
+{
+  "walletId": "123e4567-e89b-12d3-a456-426614174000",
+  "operationType": "DEPOSIT",
+  "amount": 1000
+}
+
+### 3. Списание
+POST http://localhost:8080/api/v1/wallet
+Content-Type: application/json
+
+{
+  "walletId": "123e4567-e89b-12d3-a456-426614174000",
+  "operationType": "WITHDRAW",
+  "amount": 500
+}
+
+### 4. Получить баланс
+GET http://localhost:8080/api/v1/wallets/123e4567-e89b-12d3-a456-426614174000
+
+
+### 5. Аудит операций (опционально, но ценно)
+GET http://localhost:8080/api/v1/wallets/123e4567-e89b-12d3-a456-426614174000/transactions
