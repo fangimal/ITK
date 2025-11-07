@@ -1,11 +1,17 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
+	"github.com/fangimal/ITK/internal/config"
 	"github.com/fangimal/ITK/internal/handlers"
+	"github.com/fangimal/ITK/internal/repository"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -17,17 +23,45 @@ const (
 )
 
 func main() {
+	cfg := config.Load()
+
+	// Подключаемся к БД
+	repo, err := repository.NewPostgresWalletRepository(cfg)
+	if err != nil {
+		log.Fatalf("❌ Ошибка подключения к БД: %v", err)
+	}
+	defer repo.Close()
+
 	router := httprouter.New()
-	wallet := handlers.NewWalletHandler()
+	walletHandler := handlers.NewWalletHandler(repo)
 
 	// Регистрируем обработчики с логированием
-	router.POST(createWallet, logRequest(wallet.CreateWallet))
-	router.POST(operation, logRequest(wallet.Operation))
-	router.GET(getBalance, logRequest(wallet.GetBalance))
-	router.GET(getTransactions, logRequest(wallet.GetTransactions))
+	router.POST(createWallet, logRequest(walletHandler.CreateWallet))
+	router.POST(operation, logRequest(walletHandler.Operation))
+	router.GET(getBalance, logRequest(walletHandler.GetBalance))
+	router.GET(getTransactions, logRequest(walletHandler.GetTransactions))
 
-	log.Println("Сервер запущен на :8080")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	srv := &http.Server{
+		Addr:    ":" + cfg.AppPort,
+		Handler: router,
+	}
+
+	// Graceful shutdown
+	go func() {
+		sig := make(chan os.Signal, 1)
+		signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+		<-sig
+		log.Println("⏳ Получен сигнал завершения. Завершаем сервер...")
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		_ = srv.Shutdown(ctx)
+	}()
+
+	log.Printf("🚀 Сервер запущен на порту %s", cfg.AppPort)
+	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+		log.Fatalf("❌ Сервер упал: %v", err)
+	}
+	log.Println("✅ Сервер остановлен корректно")
 }
 
 // logRequest — middleware для логирования

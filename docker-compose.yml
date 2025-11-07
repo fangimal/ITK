@@ -28,7 +28,7 @@ services:
       POSTGRES_PASSWORD: secure_password_123
       POSTGRES_DB: wallet_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./docker/db-init:/docker-entrypoint-initdb.d
