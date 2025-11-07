@@ -14,12 +14,10 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// WalletHandler — структура для хендлеров (пока без зависимостей, позже — с репозиторием)
 type WalletHandler struct {
 	repo repository.WalletRepository
 }
 
-// NewWalletHandler — конструктор
 func NewWalletHandler(repo repository.WalletRepository) *WalletHandler {
 
 	return &WalletHandler{repo: repo}

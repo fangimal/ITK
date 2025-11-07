@@ -17,7 +17,7 @@ type Config struct {
 }
 
 func Load() *Config {
-	// Загружаем .env (игнорируем ошибку, если файла нет — для CI/production)
+	// Загружаем .env
 	_ = godotenv.Load("config.env")
 
 	return &Config{

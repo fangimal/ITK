@@ -24,7 +24,7 @@ import (
 func setupTestServer(t *testing.T) (*httptest.Server, func()) {
 	cfg := &config.Config{
 		DBHost:    "localhost",
-		DBPort:    "5433", // как у тебя
+		DBPort:    "5433",
 		DBUser:    "wallet_user",
 		DBPass:    "secure_password_123",
 		DBName:    "wallet_db",
@@ -122,14 +122,14 @@ func TestE2E_WalletFlow(t *testing.T) {
 }
 
 func doRequest(t *testing.T, ts *httptest.Server, method, path string, body interface{}) *http.Response {
-	var bodyReader io.Reader // ← тип io.Reader
+	var bodyReader io.Reader
 	if body != nil {
 		b, err := json.Marshal(body)
 		require.NoError(t, err)
-		bodyReader = bytes.NewReader(b) // или bytes.NewBuffer(b) — но лучше NewReader
+		bodyReader = bytes.NewReader(b)
 	}
 
-	req, err := http.NewRequest(method, ts.URL+path, bodyReader) // ← nil или *bytes.Reader
+	req, err := http.NewRequest(method, ts.URL+path, bodyReader)
 
 	require.NoError(t, err)
 	if body != nil {

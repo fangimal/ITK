@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// OperationType — тип операции (enum)
 type OperationType string
 
 const (
@@ -22,7 +21,6 @@ type WalletOperation struct {
 	Amount        int64         `json:"amount"`
 }
 
-// Custom JSON unmarshal для OperationType (валидация)
 func (ot *OperationType) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
