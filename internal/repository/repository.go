@@ -141,3 +141,9 @@ func (r *PostgresWalletRepository) UpdateBalance(ctx context.Context, walletID u
 
 	return tx.Commit(ctx)
 }
+
+// TruncateTables — очищает таблицы (только для тестов!)
+func (r *PostgresWalletRepository) TruncateTables(ctx context.Context) error {
+	_, err := r.pool.Exec(ctx, "TRUNCATE TABLE transactions, wallets RESTART IDENTITY CASCADE")
+	return err
+}
