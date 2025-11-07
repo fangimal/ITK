@@ -47,7 +47,7 @@ wallet-service/
 ```
 
 ## 🛡️ Конкурентность
-```azure
+```sql
 SELECT balance FROM wallets WHERE id = $1 FOR UPDATE;
 -- ... compute ...
 UPDATE wallets SET balance = $1 WHERE id = $2;
